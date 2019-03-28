@@ -98,6 +98,91 @@ class Cromosoma < Array
   def Cruce
   
   end
+  
+  ##Funcion encargada de sacar las diagonales principales
+  #| X |   | 
+  #|   | X |  
+   def calcularDiagonalPrincipal (indice, valor)
+	 valores = Array.new
+	 
+	 indicefor = indice
+	 valorfor  = valor
+		
+		##Se calculan los valores diagonales hacia adelante
+		while (indicefor <= (@tamano-1) && valorfor <= (@tamano-1))  do
+			
+			valores << valorfor
+			indicefor +=1
+			valorfor  +=1
+			
+		end
+		
+		##Se calculan los valores diagonales hacia atras
+		
+		valoresnew = Array.new
+		indicefor = indice-1
+		valorfor  = valor-1
+		while (indicefor >= 0 && valorfor >= 0)  do
+			
+			valoresnew << valorfor
+			indicefor -=1
+			valorfor  -=1
+			
+		end
+		
+		puts valoresnew.reverse + valores
+		return  valoresnew.reverse + valores
+  
+  
+  end
+  
+  ##Funcion encargada de sacar las diagonales secundarias
+  #|   | X | 
+  #| X |   |  
+   def calcularDiagonalSecundaria (indice, valor)
+	 
+	 valores = Array.new
+	 
+	 indicefor = indice
+	 valorfor  = valor
+		
+		##Se calculan los valores diagonales hacia adelante
+		while (indicefor <= (@tamano-1) && valorfor >= 0)  do
+			
+			valores << valorfor
+			indicefor +=1
+			valorfor  -=1
+			
+		end
+		
+		##Se calculan los valores diagonales hacia atras
+		valoresnew = Array.new
+		indicefor = indice-1
+		valorfor  = valor+1
+		while (indicefor >= 0 && valorfor <= (@tamano-1))  do
+			
+			valoresnew << valorfor
+			indicefor -=1
+			valorfor  +=1
+			
+		end
+		
+		return valoresnew.reverse + valores
+  end
+  
+  
+  
+  ##Funcion calcularActitud
+  #retorna la actitud de el cromosoma detectando sus ataques diagonales
+  def calcularActitud
+	
+	
+	self.each_with_index do |item, index|
+			puts "se muta cromosoma: #{index}"
+			item.Mutar(3)
+	end
+    
+  end
  
 end
 
@@ -146,11 +231,30 @@ class Genetic < Array
 	
 	end
 
+	
+
+	def Actitud(cromosoma)
+		
+		cromosoma.each_with_index do |item, index|
+			
+			
+			
+			
+			
+		end
+	
+	
+	
+	end
 
 end
 
 
 
-#cormo = Cromosoma.new(15)
-hi = Genetic.new(4,10)
-hi.Ejecutar
+cormo = Cromosoma.new(8)
+puts "primaria"
+cormo.calcularDiagonalPrincipal(6,4)
+puts "secundaria"
+cormo.calcularDiagonalSecundaria(6,4)
+#hi = Genetic.new(4,10)
+#hi.Ejecutar
