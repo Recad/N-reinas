@@ -37,6 +37,8 @@ class Cromosoma < Array
 	super
     @tamano = tamano
 	self.replace ((0..(tamano -1)).to_a.shuffle.take(tamano)) 
+	
+	
 	#este metodo se salta aveces un valor
 	#(0..(tamano -1)).to_a.shuffle.take(tamano)#Truco para generar secuencias aleatorias y unicas en ruby 
 	#nuevo metodo
@@ -88,7 +90,7 @@ class Cromosoma < Array
 		
 	end
 	
-	
+	self.calcularActitud()
 	
 	
   
@@ -132,8 +134,8 @@ class Cromosoma < Array
 			
 		end
 		
-		matriz = Matrix[indicesnew.reverse + indices,valoresnew.reverse + valores]
-		#puts matriz[0]
+		matriz = Matrix[indicesnew.reverse + indices, valoresnew.reverse + valores]
+		#puts matriz[0][1]
 		#puts "values"
 		
 		# matris [filas (0 para indices- 1 para valores) , columnas son valores(valor inicial...valor final)]
@@ -177,26 +179,55 @@ class Cromosoma < Array
 			
 		end
 		matriz = Matrix[indicesnew.reverse + indices, valoresnew.reverse + valores]
-		#puts matriz[0]
+		#puts matriz[0,1]
 		#puts "values"
-		#puts matriz[1]
+		#puts matriz[1,0]
 		return matriz
   end
   
   
-=begin  
+ 
   ##Funcion calcularActitud
   #retorna la actitud de el cromosoma detectando sus ataques diagonales
   def calcularActitud
 	
+	@aptitud = 0
 	
 	self.each_with_index do |item, index|
-			puts "se muta cromosoma: #{index}"
-			item.Mutar(3)
+			
+			
+				principalTemp = calcularDiagonalPrincipal(index, item)
+				secondaryTemp = calcularDiagonalSecundaria(index, item)
+				#puts "principal es #{principalTemp}"
+				
+				#puts "secundario es #{secondaryTemp}"
+				
+				
+				principalTemp.row(0).each_with_index do |value , newindex|
+				
+				
+					if (self[value] == principalTemp.row(1)[newindex] && index != value)
+						
+						@aptitud -=1
+						
+					end
+								
+				end
+				
+				secondaryTemp.row(0).each_with_index do |value , newindex|
+				
+					
+					if (self[value] == secondaryTemp.row(1)[newindex] && index != value)
+						@aptitud -=1
+					end
+								
+				end
+			
+			
 	end
     
-  end
-=end 
+    end
+
 end
 
 
@@ -215,7 +246,9 @@ class Genetic < Array
 		@tamano = tamano
 		
 		for counter in 1..@numeroCromosomas
-			self << Cromosoma.new(tamano)
+			cromtemp = Cromosoma.new(tamano)
+			cromtemp.calcularActitud()
+			self << cromtemp
 		end
 
 	end
@@ -228,52 +261,96 @@ class Genetic < Array
 	
 	
 	#funcion ejecutar que se encarga de la ejecución del proyecto
-	def Ejecutar
+	def Ejecutar(mejores)
 	
-	##Se muta todos los cormosomas
-	#realizar mutación
-		self.each_with_index do |item, index|
-			puts "se muta cromosoma: #{index}"
-			#item.Mutar(3)
-			Actitud(item)
-		end
-	##Se evaluan los cromosomas y pasa el (o los) de mayor aptitud
-	##estos pasan al siguiente generacion
-	##si la aptitud llega a 0 se para
-	
-	
-	
-	end
-
-	
-
-	def Actitud(cromosoma)
+		i = 0
+		hayCandidato = false
 		
-		actitud=0
-		
-		cromosoma.each_with_index do |item, index|
-		
-		puts cromosoma.calcularDiagonalPrincipal(index,item)
-			
-		#puts "se pega con diagonales secundarias"
-		#puts  cromosoma-cromosoma.calcularDiagonalSecundaria(index,item)	
+		while  hayCandidato == false  do
+	
+		##Se muta todos los cormosomas
+		#realizar mutación
+			self.each_with_index do |item, index|
+				##puts "se muta cromosoma: #{index}"
 				
-		end
+				if (item.aptitud == 0 )
+					hayCandidato = true
+						puts "HAYY CANDIDATO--------------------"
+						puts "con la aptitud: #{item.aptitud}" 
+						puts item
+				end
+				
+				item.Mutar(3)
+				
+				
+			end
+		##Se evaluan los cromosomas y pasa el (o los) de mayor aptitud
+		##estos pasan al siguiente generacion
+		##si la aptitud llega a 0 se para
+		
+		## para estudiar la aptitud se ordenan los cromosomas usando el parametro ptitud
+		
+			temp = self.sort_by(&:aptitud).reverse
+			
+			self.replace(temp)
+			#self.each do |item|
+			#	puts "la generacion es"
+			#	puts item.aptitud
+				
+			#end	
+				
+				
+			##se crea la nueva generación con los n mejores de la anterior y nuevos
+			faltantes = @numeroCromosomas - mejores
+			
+			#puts "fltantes #{faltantes}"
+			nuevaGeneracion = self.take(mejores)
+				
+			#nuevaGeneracion.each do |item|
+			#	puts "la mejor generacion es"
+			#	puts item.aptitud
+			#	puts "la mejor generacion es #{nuevaGeneracion[0].aptitud}"
+			#end
+			
+			for counter in 0..faltantes-1	
+			    temp = 	Cromosoma.new(@tamano)
+			    temp.calcularActitud()
+				nuevaGeneracion << temp	
+			end
+			
+			
+			self.replace(nuevaGeneracion)
+
+			
+			
 	
-	
+	puts("generacion = #{i}" )
+	i +=1
+	end	
 	
 	end
+
+    
+  
+
 
 end
 
 
+=begin
+cormo = Cromosoma.new(8,[3,7,5,4,6,0,2,1])
 
-cormo = Cromosoma.new(8)
-puts "primaria"
-cormo.calcularDiagonalPrincipal(6,4)
+cormo.calcularActitud()
+
+puts cormo.aptitud
+
+
 
 puts "secundaria"
-cormo.calcularDiagonalSecundaria(6,4)
 
-#hi = Genetic.new(4,10)
-#hi.Ejecutar
+=end
+hi = Genetic.new(4,10)
+hi.Ejecutar(2)
+#puts hi
+
+
