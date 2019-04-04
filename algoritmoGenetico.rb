@@ -4,10 +4,18 @@
 # Autor: David Andres Ramirez
 # Email: david.andres.ramirez@correounivalle.edu.co
 # Fecha creación: 2019-03-17 
-# Fecha última modificación: 2019-03-20
+# Fecha última modificación: 2019-04-4
 # Versión: 0.1
-# Tiempo dedicado: 
+# Licencia: 
+# 	 This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    any later version.
 
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 ############################################################
 # Utilidad: Definicion de las clases principales para el proyecto de computación 
 # evolutiva 
@@ -72,8 +80,7 @@ class Cromosoma < Array
 		#puts "el array antes de mutar es"
 		 
 		#puts self
-		
-		
+			
 		i = 1
 		while i <= valormutar
 		
@@ -91,14 +98,34 @@ class Cromosoma < Array
 	end
 	
 	self.calcularActitud()
-	
-	
-  
+
   end
   
-  #Función Cruce:
+  #Función Cruce: 
   #Realiza el cruce uniforme del cromosoma- no se va a usar pero se debe implementar
-  def Cruce
+  #El cruce se realiza curzando elementos de cada cromosoma de una forma "aleatoria"
+  #dependiendo de un valor aleatorio se cruza o no un cromososma.
+  
+  ## IMPORTANTE: Esta funcion debe usarse con apoyo de la clase donde se realice el 
+  #cambio de generaciones, es decir se debe manejar en la clase Genetic si se desea usar
+  def Cruce (cromosomaDeCruce)
+	
+	##Se cruzan los cromosomas 
+	
+		self.each_with_index do |value , index| 
+			
+			posibilidad = rand(0..1)
+				
+			if posibilidad == 1
+					valorTemp = self[index]
+					self[index]	= cromosomaDeCruce[index]
+					cromosomaDeCruce[index] = valorTemp
+						
+			end
+								
+		end
+		
+	return cromosomaDeCruce
   
   end
   
@@ -185,26 +212,21 @@ class Cromosoma < Array
 		return matriz
   end
   
-  
- 
   ##Funcion calcularActitud
   #retorna la actitud de el cromosoma detectando sus ataques diagonales
   def calcularActitud
 	
 	@aptitud = 0
 	
-	self.each_with_index do |item, index|
-			
+	self.each_with_index do |item, index|	
 			
 				principalTemp = calcularDiagonalPrincipal(index, item)
 				secondaryTemp = calcularDiagonalSecundaria(index, item)
 				#puts "principal es #{principalTemp}"
 				
-				#puts "secundario es #{secondaryTemp}"
-				
+				#puts "secundario es #{secondaryTemp}"	
 				
 				principalTemp.row(0).each_with_index do |value , newindex|
-				
 				
 					if (self[value] == principalTemp.row(1)[newindex] && index != value)
 						
@@ -215,18 +237,15 @@ class Cromosoma < Array
 				end
 				
 				secondaryTemp.row(0).each_with_index do |value , newindex|
-				
 					
 					if (self[value] == secondaryTemp.row(1)[newindex] && index != value)
 						@aptitud -=1
 					end
 								
 				end
-			
-			
 	end
     
-    end
+  end
 
 end
 
@@ -240,8 +259,7 @@ class Genetic < Array
 	#Constructor de la clase
 	#Recibe un numero de cromosomas y los crea 
 	def initialize(cromosomas,tamano)
-		
-	
+			
 		@numeroCromosomas = cromosomas
 		@tamano = tamano
 		
@@ -252,14 +270,7 @@ class Genetic < Array
 		end
 
 	end
-	
-	#Función para determinar la aptitud dependiendo de los ataques
-	
-	
-	
-	
-	
-	
+		
 	#funcion ejecutar que se encarga de la ejecución del proyecto
 	def Ejecutar(mejores)
 	
@@ -277,12 +288,11 @@ class Genetic < Array
 					hayCandidato = true
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
-						puts item
+						puts item						
 				end
 				
 				item.Mutar(3)
-				
-				
+					
 			end
 		##Se evaluan los cromosomas y pasa el (o los) de mayor aptitud
 		##estos pasan al siguiente generacion
@@ -297,8 +307,7 @@ class Genetic < Array
 			#	puts "la generacion es"
 			#	puts item.aptitud
 				
-			#end	
-				
+			#end		
 				
 			##se crea la nueva generación con los n mejores de la anterior y nuevos
 			faltantes = @numeroCromosomas - mejores
@@ -316,39 +325,115 @@ class Genetic < Array
 			    temp = 	Cromosoma.new(@tamano)
 			    temp.calcularActitud()
 				nuevaGeneracion << temp	
-			end
-			
-			
+			end		
+					
 			self.replace(nuevaGeneracion)
 
-			
-			
-	
-	puts("generacion = #{i}" )
-	i +=1
-	end	
+		puts("generacion = #{i}" )
+		i +=1
+		end	
 	
 	end
-
+	
+	#Funcion Ejecutar con variedad:
+	#esta funcion realiza la seleción de la nueva generación por medio del (los) cromosomas mas variados
+	#siendo estos los que pasen a la siguiente generación
     
-  
+    def EjecutarVariedad(mejores)
+		
+		i = 0
+		hayCandidato = false
+		
+		while  hayCandidato == false  do
+	
+			##Se muta todos los cormosomas
+			#realizar mutación
+			self.each_with_index do |item, index|
+				##puts "se muta cromosoma: #{index}"
+				
+				if (item.aptitud == 0 )
+					hayCandidato = true
+						puts "HAYY CANDIDATO--------------------"
+						puts "con la aptitud: #{item.aptitud}" 
+						puts item						
+				end
+				
+				item.Mutar(3)
+					
+			end
+			##Se evaluan los cromosomas y pasa el (o los) de  aptitud mas lejana
+			##estos pasan al siguiente generacion
+			##si la aptitud llega a 0 se para
+			
+			## para estudiar la aptitud se ordenan los cromosomas usando el parametro ptitud
+		
+			temp = self.sort_by(&:aptitud).reverse
+			
+			self.replace(temp)
+			
+			#se calcula la distancia entre las aptitudes
+			
+			self.each_with_index do |item, index|
+				
+					
+			end
+			
+				
+			##se crea la nueva generación con los n mejores de la anterior y nuevos
+			faltantes = @numeroCromosomas - mejores
+			
+			#puts "fltantes #{faltantes}"
+			nuevaGeneracion = self.take(mejores)
+				
+			#nuevaGeneracion.each do |item|
+			#	puts "la mejor generacion es"
+			#	puts item.aptitud
+			#	puts "la mejor generacion es #{nuevaGeneracion[0].aptitud}"
+			#end
+			
+			for counter in 0..faltantes-1	
+			    temp = 	Cromosoma.new(@tamano)
+			    temp.calcularActitud()
+				nuevaGeneracion << temp	
+			end		
+					
+			self.replace(nuevaGeneracion)
 
-
+		puts("generacion = #{i}" )
+		i +=1
+		end	
+		
+    
+    
+    
+    
+    end
 end
 
 
 =begin
-cormo = Cromosoma.new(8,[3,7,5,4,6,0,2,1])
+cormo = Cromosoma.new(8)
 
+holi = Cromosoma.new(8)
 cormo.calcularActitud()
-
+puts "se muestra el primer cromosoma"
 puts cormo.aptitud
+puts cormo
+puts "se muestra el segundo cromosoma cromosoma"
+puts holi
+puts "se cruza con base primer cromosoma"
+holi = cormo.Cruce(holi)
+puts "se muestra el primer cromosoma cruzado"
+puts cormo
+puts "se muestra el segundo cromosoma cruzado"
+puts holi
+
 
 
 
 puts "secundaria"
-
 =end
+
 hi = Genetic.new(4,10)
 hi.Ejecutar(2)
 #puts hi
