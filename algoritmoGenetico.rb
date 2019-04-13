@@ -90,14 +90,13 @@ class Cromosoma < Array
 			indicedearranque = indicedearranque+2
 			i+=2
 		end
-		#puts "el array despues de mutar es"
-		 
-		#puts self
 		
 		
 	end
 	
 	self.calcularActitud()
+	
+	
 
   end
   
@@ -162,11 +161,9 @@ class Cromosoma < Array
 		end
 		
 		matriz = Matrix[indicesnew.reverse + indices, valoresnew.reverse + valores]
-		#puts matriz[0][1]
-		#puts "values"
-		
+				
 		# matris [filas (0 para indices- 1 para valores) , columnas son valores(valor inicial...valor final)]
-		#puts matriz[0,5]
+		# ejemplo : puts matriz[0,5]
 		return matriz
   
   
@@ -206,11 +203,10 @@ class Cromosoma < Array
 			
 		end
 		matriz = Matrix[indicesnew.reverse + indices, valoresnew.reverse + valores]
-		#puts matriz[0,1]
-		#puts "values"
-		#puts matriz[1,0]
 		return matriz
   end
+  
+  
   
   ##Funcion calcularActitud
   #retorna la actitud de el cromosoma detectando sus ataques diagonales
@@ -273,7 +269,7 @@ class Genetic < Array
 		
 	#funcion ejecutar que se encarga de la ejecución del proyecto
 	def Ejecutar(mejores)
-	
+		candidato = nil
 		i = 0
 		hayCandidato = false
 		
@@ -282,13 +278,15 @@ class Genetic < Array
 		##Se muta todos los cormosomas
 		#realizar mutación
 			self.each_with_index do |item, index|
-				##puts "se muta cromosoma: #{index}"
+				
 				
 				if (item.aptitud == 0 )
 					hayCandidato = true
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
-						puts item						
+						puts item	
+						puts "con la generacion #{i}"
+						candidato = item						
 				end
 				
 				item.Mutar(3)
@@ -303,23 +301,14 @@ class Genetic < Array
 			temp = self.sort_by(&:aptitud).reverse
 			
 			self.replace(temp)
-			#self.each do |item|
-			#	puts "la generacion es"
-			#	puts item.aptitud
-				
-			#end		
 				
 			##se crea la nueva generación con los n mejores de la anterior y nuevos
 			faltantes = @numeroCromosomas - mejores
 			
-			#puts "fltantes #{faltantes}"
+			
 			nuevaGeneracion = self.take(mejores)
 				
-			#nuevaGeneracion.each do |item|
-			#	puts "la mejor generacion es"
-			#	puts item.aptitud
-			#	puts "la mejor generacion es #{nuevaGeneracion[0].aptitud}"
-			#end
+			
 			
 			for counter in 0..faltantes-1	
 			    temp = 	Cromosoma.new(@tamano)
@@ -329,18 +318,23 @@ class Genetic < Array
 					
 			self.replace(nuevaGeneracion)
 
-		puts("generacion = #{i}" )
+
 		i +=1
 		end	
-	
+		
+		#este return es ayuda para los testers
+		return candidato
 	end
 	
 	#Funcion Ejecutar con variedad:
 	#esta funcion realiza la seleción de la nueva generación por medio del (los) cromosomas mas variados
 	#siendo estos los que pasen a la siguiente generación
+	#Para saber cuales son los cromososmas mas variados se usa la aptitud se eliminan 
+	#los que tengan aptitudes iguales, pero siempre se deja uno para no eliminar a todos los peores
     
-    def EjecutarVariedad(mejores)
+    def EjecutarVariedad
 		
+		candidato = nil
 		i = 0
 		hayCandidato = false
 		
@@ -349,13 +343,14 @@ class Genetic < Array
 			##Se muta todos los cormosomas
 			#realizar mutación
 			self.each_with_index do |item, index|
-				##puts "se muta cromosoma: #{index}"
+				
 				
 				if (item.aptitud == 0 )
 					hayCandidato = true
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
-						puts item						
+						puts item	
+						puts "con la generción #{i}"					
 				end
 				
 				item.Mutar(3)
@@ -365,31 +360,54 @@ class Genetic < Array
 			##estos pasan al siguiente generacion
 			##si la aptitud llega a 0 se para
 			
-			## para estudiar la aptitud se ordenan los cromosomas usando el parametro ptitud
+			## para estudiar la aptitud se ordenan los cromosomas usando el parametro aptitud
 		
 			temp = self.sort_by(&:aptitud).reverse
 			
 			self.replace(temp)
+					
+			#Se utiliza un hash para guardar el indice de inicio
+			distancias = Hash.new
 			
-			#se calcula la distancia entre las aptitudes
+			#este array se usar como ayuda para eliminar los repetidos del hash
+			arr = Array.new
+			
+			#se calcula la distancia entre las aptitudes de cada cromosoma
+			# por ejemplo en el indice 0 de el array distancias sera la istancia entr el cromosoma 0 y 1
 			
 			self.each_with_index do |item, index|
 				
+				
+					if (index < (self.length - 1 ))
+					
+						distanciaDerecha = self[index+1].aptitud.abs - item.aptitud.abs
+					
+						distancias.store(index , distanciaDerecha )
+					end	
 					
 			end
 			
-				
-			##se crea la nueva generación con los n mejores de la anterior y nuevos
-			faltantes = @numeroCromosomas - mejores
+			#aqui sacamos lo unicos con sus indices ayudado de un hash
+			unicos = distancias.each{|key, val| arr.include?(val) ? distancias.delete(key) : arr << val }
 			
-			#puts "fltantes #{faltantes}"
-			nuevaGeneracion = self.take(mejores)
+			
+			#aqui ordenamos el hash para sacar las mayores distancias
+			unicosSort = Hash[(unicos.sort_by { |name, age| age }).reverse]
+			
+			
+			#Ahora transformo en los cromosomas que lo representan y y los paso como los mejores en la nueva generacion
+			
+			nuevaGeneracion = Array.new
+			
+			unicosSort.keys.each do |item|
 				
-			#nuevaGeneracion.each do |item|
-			#	puts "la mejor generacion es"
-			#	puts item.aptitud
-			#	puts "la mejor generacion es #{nuevaGeneracion[0].aptitud}"
-			#end
+				nuevaGeneracion << self[item]		
+				
+					
+			end
+	
+			faltantes = @numeroCromosomas - nuevaGeneracion.length
+			##se crea la nueva generación con los n mejores de la anterior y nuevos
 			
 			for counter in 0..faltantes-1	
 			    temp = 	Cromosoma.new(@tamano)
@@ -399,43 +417,268 @@ class Genetic < Array
 					
 			self.replace(nuevaGeneracion)
 
-		puts("generacion = #{i}" )
+		
 		i +=1
 		end	
 		
-    
+		#este return es ayuda para los testers
+		return candidato
     
     
     
     end
+ 
+
+	#Funcion Ejecutar con variedad pero solo eliminando las aptitudes repetidas:
+	#esta funcion realiza la seleción de la nueva generación por medio del (los) cromosomas mas variados
+	#siendo estos los que pasen a la siguiente generación
+	#Para saber cuales son los cromososmas mas variados se usa la aptitud se eliminan 
+	#los que tengan aptitudes iguales, pero siempre se deja uno para no eliminar a todos los peores  
+    
+	def EjecutarVariedadRepetidos
+			candidato = nil
+			i = 0
+			hayCandidato = false
+			
+			while  hayCandidato == false  do
+		
+				##Se muta todos los cormosomas
+				#realizar mutación
+				self.each_with_index do |item, index|
+					
+					
+					if (item.aptitud == 0 )
+						hayCandidato = true
+							puts "HAYY CANDIDATO--------------------"
+							puts "con la aptitud: #{item.aptitud}" 
+							puts item	
+							puts "con la generción #{i}"					
+					end
+					
+					item.Mutar(3)
+						
+				end
+				##Se evaluan los cromosomas y pasa el (o los) de  aptitud mas lejana
+				##estos pasan al siguiente generacion
+				##si la aptitud llega a 0 se para
+				
+				## para estudiar la aptitud se ordenan los cromosomas usando el parametro aptitud
+			
+				temp = self.sort_by(&:aptitud).reverse
+				
+				self.replace(temp)
+						
+				
+				#eliminamos a los que tengan aptitudes repetidas y los otros los pasamos a la nueva generacion
+				
+				nuevaGeneracion =  self.uniq {|obj| obj.aptitud}
+				
+								
+				faltantes = @numeroCromosomas - nuevaGeneracion.length #se determinan los faltantes
+				##se crea la nueva generación con los n mejores de la anterior y nuevos
+
+				
+
+				for counter in 0..faltantes-1	
+					temp = 	Cromosoma.new(@tamano)
+					temp.calcularActitud()
+					nuevaGeneracion << temp	
+				end		
+						
+				self.replace(nuevaGeneracion)
+
+			
+			i +=1
+			end	
+			
+		
+		#este return es ayuda para los testers
+		return candidato
+		
+		
+	end
+	
+	#fundion EjecutarMixed: 
+	#esta funcion esta encargada de ejecutar utilizando como funcion aptitud una mezcla entre 
+	#pasar las mas variables y las mejores
+	#Nosostros lo que haremos es escoger los mejores cromosomas, y de esos escoger los mas variables por 
+	#el metodo de las aptitudes repetidas
+	def EjecutarMixed(mejores)
+		candidato = nil
+		i = 0
+		hayCandidato = false
+		
+		while  hayCandidato == false  do
+	
+		##Se muta todos los cormosomas
+		#realizar mutación
+			self.each_with_index do |item, index|
+				##puts "se muta cromosoma: #{index}"
+				
+				if (item.aptitud == 0 )
+					hayCandidato = true
+						puts "HAYY CANDIDATO--------------------"
+						puts "con la aptitud: #{item.aptitud}" 
+						puts item	
+						puts "con la generacion #{i}"						
+				end
+				
+				item.Mutar(3)
+					
+			end
+		##Se evaluan los cromosomas y pasa el (o los) de mayor aptitud
+		##estos pasan al siguiente generacion
+		##si la aptitud llega a 0 se para
+		
+		## para estudiar la aptitud se ordenan los cromosomas usando el parametro ptitud
+		
+			temp = self.sort_by(&:aptitud).reverse
+			
+			self.replace(temp)
+				
+			##se crea la nueva generación con los n mejores de la anterior y nuevos
+			
+			nuevaGeneracionMejores = self.take(mejores) #se toman los mejores
+			
+			##AQUI se aplica el filtro por aptitudes repetidas
+				
+			nuevaGeneracion =  nuevaGeneracionMejores.uniq {|obj| obj.aptitud}
+									
+			faltantes = @numeroCromosomas - nuevaGeneracion.length
+			
+			for counter in 0..faltantes-1	
+			    temp = 	Cromosoma.new(@tamano)
+			    temp.calcularActitud()
+				nuevaGeneracion << temp	
+			end		
+					
+			self.replace(nuevaGeneracion)
+
+		i +=1
+		end	
+		
+		#este return es ayuda para los testers
+		return candidato
+	end
+	
+	
 end
 
 
-=begin
-cormo = Cromosoma.new(8)
+#Clase encargada de desplegar un menu
+#se realiza en una clase aparte para hacer mas versatil el programa
+class MenuWrapper
+	
+	def initialize
+		
+	end
 
-holi = Cromosoma.new(8)
-cormo.calcularActitud()
-puts "se muestra el primer cromosoma"
-puts cormo.aptitud
-puts cormo
-puts "se muestra el segundo cromosoma cromosoma"
-puts holi
-puts "se cruza con base primer cromosoma"
-holi = cormo.Cruce(holi)
-puts "se muestra el primer cromosoma cruzado"
-puts cormo
-puts "se muestra el segundo cromosoma cruzado"
-puts holi
+	#Funcion menuEjecutar.
+	#esta funcion es un pequeño menu para el usuario final
+	def menuEjecutar
+		
+		
+		puts "------------BIENVENIDO A N-REINAS-EVOLUTIVO---------------\n\n"
+		
+		#puts "El resultado se guardara en un archivo llamado solucion.txt\n"
+		
+		puts "-------------------------MENU-----------------------------\n\n"
+		
+		puts "Ingresa el numero de cromosomas para trabajar"
+		numcromosomas = gets.chomp.to_i
+		
+		if numcromosomas < 2
+			puts "deben ser mas de 2 cromosomas, por defecto te asignaremos 4"
+			numcromosomas = 4
+		end
+		puts "Ingresa el tamaño que tendran los cromosomas"
+		tama = gets.chomp.to_i
+		if tama < 4
+			puts "se recomienda que el tamaño de los cromosomas sean mayor que 3
+			\n te asiganremos por defecto el tamaño 4"
+			tama = 4
+		end
+		
+		hi = Genetic.new(numcromosomas,tama)
+		
+		valido = false
+		
+		while valido == false
+		
+			
+			puts "Selecione una funcion objetivo de las siguiente usando numeros del 1 al 4
+			\n 1 -> pasan los de mejor aptitud
+			\n 2 -> pasan los mas variados por distancia entre aptitudes
+			\n 3 -> pasan los mas variados por metodos de las aptitudes no repetidas
+			\n 4 -> pasan los de mejor aptitud y mas variables por aptitudes no repetidas"
+			 option = gets.chomp.to_i
+			if option <= 4
+			 valido = true
+			end
+		end
+		
+		case option
+			when 1
+			  puts "Ingrese la cantidad de los mejores que pasan"
+			  cantidadMejores = gets.chomp.to_i
+			  
+			  if cantidadMejores >= numcromosomas
+				puts "Nu pueden pasar todos los cromosomas, eso no es interesante :("
+				
+				puts "por defecto tomaremos la mitad de los cromosomas"
+				
+				
+				puts "se inicia la ejecución...se recomienda ir por un tinto"
+				hi.Ejecutar((numcromosomas / 2).ceil)
+				
+				
+			  else 
+				puts "se inicia la ejecución...se recomienda ir por un tinto"
+				hi.Ejecutar(cantidadMejores)
+				
+			  end
+			  
+			  
+			  
+			when 2
+				puts "se inicia la ejecución...se recomienda ir por un tinto"
+				hi.EjecutarVariedad
+			when 3
+				puts "se inicia la ejecución...se recomienda ir por un tinto"
+				hi.EjecutarVariedadRepetidos
+			when 4
+			  puts "Ingrese la cantidad de los mejores que pasan"
+			  cantidadMejores = gets.chomp.to_i
+			  
+			  if cantidadMejores >= numcromosomas
+				puts "Nu pueden pasar todos los cromosomas, eso no es interesante :("
+				
+				puts "por defecto tomaremos la mitad de los cromosomas"
+				
+				
+				puts "se inicia la ejecución...se recomienda ir por un tinto"
+				hi.EjecutarMixed((numcromosomas / 2).ceil)
+				
+				
+			  else 
+				puts "se inicia la ejecución...se recomienda ir por un tinto"
+				hi.EjecutarMixed(cantidadMejores)
+				
+			  end
+			else
+			  puts "Se nos ha escapado una opción no valida :("
+		end
+	
+	
+	
+	end
+	
+	
+end
 
-
-
-
-puts "secundaria"
-=end
-
-hi = Genetic.new(4,10)
-hi.Ejecutar(2)
+menu = MenuWrapper.new()
+#hi.EjecutarMixed(5)
+menu.menuEjecutar
 #puts hi
 
 
