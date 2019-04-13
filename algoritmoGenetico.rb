@@ -65,8 +65,10 @@ class Cromosoma < Array
 	
 		puts "No puede tener un valor mas igual o mas grande que el tamaño del arreglo"
 	else
-	
+		 
 		valormutar = (@tamano / porcentaje).ceil
+		
+		
 		if (valormutar <= 1) || (valormutar % 2 == 1)
 			valormutar = valormutar+1
 		end
@@ -268,7 +270,7 @@ class Genetic < Array
 	end
 		
 	#funcion ejecutar que se encarga de la ejecución del proyecto
-	def Ejecutar(mejores)
+	def Ejecutar(mejores,mutacion)
 		candidato = nil
 		i = 0
 		hayCandidato = false
@@ -289,7 +291,7 @@ class Genetic < Array
 						candidato = item						
 				end
 				
-				item.Mutar(3)
+				item.Mutar(mutacion)
 					
 			end
 		##Se evaluan los cromosomas y pasa el (o los) de mayor aptitud
@@ -332,7 +334,7 @@ class Genetic < Array
 	#Para saber cuales son los cromososmas mas variados se usa la aptitud se eliminan 
 	#los que tengan aptitudes iguales, pero siempre se deja uno para no eliminar a todos los peores
     
-    def EjecutarVariedad
+    def EjecutarVariedad(mutacion)
 		
 		candidato = nil
 		i = 0
@@ -353,7 +355,7 @@ class Genetic < Array
 						puts "con la generción #{i}"					
 				end
 				
-				item.Mutar(3)
+				item.Mutar(mutacion)
 					
 			end
 			##Se evaluan los cromosomas y pasa el (o los) de  aptitud mas lejana
@@ -435,7 +437,7 @@ class Genetic < Array
 	#Para saber cuales son los cromososmas mas variados se usa la aptitud se eliminan 
 	#los que tengan aptitudes iguales, pero siempre se deja uno para no eliminar a todos los peores  
     
-	def EjecutarVariedadRepetidos
+	def EjecutarVariedadRepetidos(mutacion)
 			candidato = nil
 			i = 0
 			hayCandidato = false
@@ -455,7 +457,7 @@ class Genetic < Array
 							puts "con la generción #{i}"					
 					end
 					
-					item.Mutar(3)
+					item.Mutar(mutacion)
 						
 				end
 				##Se evaluan los cromosomas y pasa el (o los) de  aptitud mas lejana
@@ -503,7 +505,7 @@ class Genetic < Array
 	#pasar las mas variables y las mejores
 	#Nosostros lo que haremos es escoger los mejores cromosomas, y de esos escoger los mas variables por 
 	#el metodo de las aptitudes repetidas
-	def EjecutarMixed(mejores)
+	def EjecutarMixed(mejores,mutacion)
 		candidato = nil
 		i = 0
 		hayCandidato = false
@@ -523,7 +525,7 @@ class Genetic < Array
 						puts "con la generacion #{i}"						
 				end
 				
-				item.Mutar(3)
+				item.Mutar(mutacion)
 					
 			end
 		##Se evaluan los cromosomas y pasa el (o los) de mayor aptitud
@@ -587,16 +589,24 @@ class MenuWrapper
 		puts "Ingresa el numero de cromosomas para trabajar"
 		numcromosomas = gets.chomp.to_i
 		
-		if numcromosomas < 2
+		if numcromosomas < 2 
 			puts "deben ser mas de 2 cromosomas, por defecto te asignaremos 4"
 			numcromosomas = 4
 		end
 		puts "Ingresa el tamaño que tendran los cromosomas"
 		tama = gets.chomp.to_i
-		if tama < 4
+		if tama < 4 
 			puts "se recomienda que el tamaño de los cromosomas sean mayor que 3
 			\n te asiganremos por defecto el tamaño 4"
 			tama = 4
+		end
+		
+		puts "Ingresa el porcentaje de mutacion entre 1 y 3"
+		muta = gets.chomp.to_i
+		
+		if muta > 3 || muta < 1
+			puts "deben ser un valor entero entre 1 y 3, te asignaremos 3 por defecto que muta poco"
+			muta = 3
 		end
 		
 		hi = Genetic.new(numcromosomas,tama)
@@ -629,12 +639,12 @@ class MenuWrapper
 				
 				
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.Ejecutar((numcromosomas / 2).ceil)
+				hi.Ejecutar((numcromosomas / 2).ceil , muta)
 				
 				
 			  else 
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.Ejecutar(cantidadMejores)
+				hi.Ejecutar(cantidadMejores, muta)
 				
 			  end
 			  
@@ -642,10 +652,10 @@ class MenuWrapper
 			  
 			when 2
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.EjecutarVariedad
+				hi.EjecutarVariedad(muta)
 			when 3
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.EjecutarVariedadRepetidos
+				hi.EjecutarVariedadRepetidos(muta)
 			when 4
 			  puts "Ingrese la cantidad de los mejores que pasan"
 			  cantidadMejores = gets.chomp.to_i
@@ -657,12 +667,12 @@ class MenuWrapper
 				
 				
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.EjecutarMixed((numcromosomas / 2).ceil)
+				hi.EjecutarMixed((numcromosomas / 2).ceil, muta)
 				
 				
 			  else 
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.EjecutarMixed(cantidadMejores)
+				hi.EjecutarMixed(cantidadMejores,muta)
 				
 			  end
 			else

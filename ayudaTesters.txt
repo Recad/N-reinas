@@ -1,1 +1,99 @@
-hi
+Para probar las funciones
+
+
+Para probar la creacion valida de todos los cromosomas:
+
+ 1) se crea el cromosoma usando Cromosoma.new(tamaño)
+ 2) para probar si es cromosoma valido se prueba que no tenga valores repetidos
+ para hacer esto recommiendo guardar el tamaño del cromosoma con la ayuda de .length
+ 3) le aplico al cromosoma la operacion .uniq y se compara su nuevo tamaño con el tamaño antes de la operacion
+ si el tamaño cambio el cromosoma es un cromosoma invalido ya que tenia repetidos
+ ---------------------------------------------------------------------------------------------------------------
+ 
+Para evaluar la mutacion de un cromosoma recomiendo no matarse mucho. simplemente se guarda el cromosoma en una variable, se le aplica 
+una mutacion con valor de 2 y se comparan uno a uno con un for si en los indices son los mismo el nuevo y el que se guardo
+
+si se quieren matar un poco mas  se puede agarrar el cormosoma y calcular cuantos elementos se van a mutar 
+para esto se debe entender que la cantidad de elementos que se mutan estan dados por valormutar = (@tamano / porcentaje).ceil
+es decir se van a mutar el entero inmediata,ente anterior de la division entre el tamaño y el porcentaje a mutar
+
+EJ: cromosoma de tamaño -> 9, valor de mutacion 2 (porcentaje)
+
+se van a mutar ( 9 / 2) = 4.5 -> se le aplica el ceil = 4 (se mutan 4 elementos)
+
+y estos seran la cantidad de elementos diferentes 
+
+----------------------------------------------------------------------------------------------------------------------
+
+para probar la funcion cruce es muy simple
+
+si tengo un cromoroma y llamo la funcion cruce metiendole un cromosoma con el que se va a cruzar el resultado 
+sera un cruce uniforme aleatorio, es decir que el resultado en algunos elementos tendra los valores del cromosoma que le entro 
+
+EJ: cromosoma A -> 2,5,3,7,1,4,6    B -> 1,7,4,6,2,5,3
+
+al cruzarse puede dar como resultado A' -> 2,7,3,6,1,4,3  B' -> 1,5,4,7,2,5,6
+
+para compararlos recomeindo usar las funciones de array de ruby. las operaciones basica como & A con A' y el resultado tendra  
+
+los que estan en comun ver mas en https://ruby-doc.org/core-2.2.0/Array.html
+----------------------------------------------------------------------------------------------------------------------------
+
+Para calcular las diagonales se pueden ayudar de la funcion misma, esta funciona con el tamaño del cromosoma para no salirse
+
+por ejemplo si el entra el valor de 5 en el indice 1 calcula los indices restantes hacia atras y hacia adelante
+
+indice   1  -> 0 - 2 - 3   
+valor	 5 	-> 4 - 6 - 7
+
+si ven estas diagonalesse calculan simplemente restando los indices hasta antes de llegar a 0 y restar los valores hastan antes de llegar a 0
+o a que se llegue el indice 0
+
+esta se las prefeririar explicar en un videito o en vivo}
+
+pero por ejemplo las diagonlaes del valor 5 en indice 1 serian asi en un cromosoma de tamaño 8
+
+principal
+
+indice 0 - 1 - 2 - 3
+valor  4 - 5 - 6 - 7
+
+secundaria
+
+indice 0 - 1 - 2 - 3 - 4 - 5 - 6
+valor  6 - 5 - 4 - 3 - 2 - 1 - 0
+
+------------------------------------------------------------------------------------------------------------------------------------------
+El calculo de la aptitud se hace agarrando cada elemento del cormosoma y sacando sus digonales
+despues se buscan si estas diagonales tiene elementos en comun con el cromosoma, por cada elemento en comun se resta 1
+
+
+EJ:
+
+CROMOSOMA -> 2,0,7,3,6,4,1,5
+
+
+en diagonal proncipal
+
+indice 0(2) choca con indice 4(6) y biseversa, se restan 2 aptitud = -2
+
+indice 1(0) choca con indice 5(4) y biseversa, se restan 2 aptitud = -4
+
+en diagonal secundaria
+
+indice 2(7) choca con indice 5(4) y biseversa, se restan 2 aptitud = -6
+
+aptitud final -6
+
+se pueden ayudar de la misma funcion para ver las aptitudes, es decir generan un cromosoma lo escriben y con la funcion ven su aptitud
+depues sabiendo cual es la aptitud pueden rectificarla a mano y volverla a pasar a la funcion 
+lo malo de esta funcion es que si hay 3 atacandose por ejemplo la aptitud sera -3 por cada ataque, es decir -3 x 3
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+para las funciones de ejecutar les recomiendo leer los metodos pero tampoco se asaren por eso.
+Simplemente deben evaluar que el resultado que retorna  sea respuesta al problema, para esto se puede ayudar de la funcion que hagan para 
+validar la aptitud . Tambien el profe hablo de algo de tablas en cucumber pero no tenog ni idea
+
+
+
