@@ -69,31 +69,43 @@ class Cromosoma < Array
 		valormutar = (@tamano / porcentaje).ceil
 		
 		
+		
 		if (valormutar <= 1) || (valormutar % 2 == 1)
 			valormutar = valormutar+1
 		end
 		
-		indicedearranque = rand((@tamano-1) - valormutar)
+		if porcentaje == 1
+			
+			indicedearranque = 0
+		
+		else
+			indicedearranque = rand((@tamano-1) - valormutar)
+		end
 		
 		#puts "el valor de mutación es"
 		#puts valormutar
 		#puts "el valor random es"
 		#puts indicedearranque
-		#puts "el array antes de mutar es"
-		 
-		#puts self
+		
 			
 		i = 1
-		while i <= valormutar
-		
-			valorTemp = self[indicedearranque]
-			self[indicedearranque] = self[indicedearranque+1]
-			self[indicedearranque+1] = valorTemp
-			indicedearranque = indicedearranque+2
-			i+=2
+		while i <= valormutar 
+			
+			if indicedearranque == (@tamano-1)
+				
+				valorTemp = self[indicedearranque]
+				self[indicedearranque] = self[0]
+				self[0] = valorTemp
+				i+=2
+				
+			else
+				valorTemp = self[indicedearranque]
+				self[indicedearranque] = self[indicedearranque+1]
+				self[indicedearranque+1] = valorTemp
+				indicedearranque = indicedearranque+2
+				i+=2
+			end
 		end
-		
-		
 	end
 	
 	self.calcularActitud()
@@ -136,7 +148,7 @@ class Cromosoma < Array
    def calcularDiagonalPrincipal (indice, valor)
 	 valores = Array.new
 	 indices = Array.new
-	 
+	 	 
 	 indicefor = indice
 	 valorfor  = valor
 		
@@ -279,16 +291,15 @@ class Genetic < Array
 	
 		##Se muta todos los cormosomas
 		#realizar mutación
-			self.each_with_index do |item, index|
-				
-				
+			self.each_with_index do |item, index|				
 				if (item.aptitud == 0 )
 					hayCandidato = true
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
 						puts item	
 						puts "con la generacion #{i}"
-						candidato = item						
+						candidato = item	
+						break if hayCandidato == true				
 				end
 				
 				item.Mutar(mutacion)
@@ -352,7 +363,8 @@ class Genetic < Array
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
 						puts item	
-						puts "con la generción #{i}"					
+						puts "con la generción #{i}"
+						break if hayCandidato == true					
 				end
 				
 				item.Mutar(mutacion)
@@ -454,7 +466,8 @@ class Genetic < Array
 							puts "HAYY CANDIDATO--------------------"
 							puts "con la aptitud: #{item.aptitud}" 
 							puts item	
-							puts "con la generción #{i}"					
+							puts "con la generción #{i}"
+							break if hayCandidato == true					
 					end
 					
 					item.Mutar(mutacion)
@@ -522,7 +535,8 @@ class Genetic < Array
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
 						puts item	
-						puts "con la generacion #{i}"						
+						puts "con la generacion #{i}"	
+						break if hayCandidato == true					
 				end
 				
 				item.Mutar(mutacion)
@@ -686,8 +700,9 @@ class MenuWrapper
 	
 end
 
+#hi = Genetic.new(100,5)
 menu = MenuWrapper.new()
-#hi.EjecutarMixed(5)
+#hi.Ejecutar(1,1)
 menu.menuEjecutar
 #puts hi
 
