@@ -593,6 +593,7 @@ class MenuWrapper
 	#esta funcion es un pequeño menu para el usuario final
 	def menuEjecutar
 		
+		sol = Array.new
 		
 		puts "------------BIENVENIDO A N-REINAS-EVOLUTIVO---------------\n\n"
 		
@@ -653,12 +654,12 @@ class MenuWrapper
 				
 				
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.Ejecutar((numcromosomas / 2).ceil , muta)
+				sol=hi.Ejecutar((numcromosomas / 2).ceil , muta)
 				
 				
 			  else 
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.Ejecutar(cantidadMejores, muta)
+				sol=hi.Ejecutar(cantidadMejores, muta)
 				
 			  end
 			  
@@ -666,10 +667,10 @@ class MenuWrapper
 			  
 			when 2
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.EjecutarVariedad(muta)
+				sol=hi.EjecutarVariedad(muta)
 			when 3
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.EjecutarVariedadRepetidos(muta)
+				sol=hi.EjecutarVariedadRepetidos(muta)
 			when 4
 			  puts "Ingrese la cantidad de los mejores que pasan"
 			  cantidadMejores = gets.chomp.to_i
@@ -681,20 +682,41 @@ class MenuWrapper
 				
 				
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.EjecutarMixed((numcromosomas / 2).ceil, muta)
+				sol=hi.EjecutarMixed((numcromosomas / 2).ceil, muta)
 				
 				
 			  else 
 				puts "se inicia la ejecución...se recomienda ir por un tinto"
-				hi.EjecutarMixed(cantidadMejores,muta)
+				sol=hi.EjecutarMixed(cantidadMejores,muta)
 				
 			  end
 			else
 			  puts "Se nos ha escapado una opción no valida :("
 		end
 	
+		puts "desea ver una representacion grafica de la solución? Y/N"
+		graph = gets.chomp
+		puts "------------------------------------------------------------"
+		
+		if graph == 'Y' || graph == 'y'
+			haciaAdelante=0
+			
+			
+			
+			
+			sol.each_with_index do |item, index| 
+				stringGenerate = '|0'*sol.length + '|'
+				stringShow = stringGenerate
+				
+				stringShow[(item*2)+1]='X'
+				
+				puts stringShow
+				
 	
-	
+			end
+			
+			
+		end
 	end
 	
 	
