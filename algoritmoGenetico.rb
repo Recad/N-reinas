@@ -124,21 +124,22 @@ class Cromosoma < Array
   def Cruce (cromosomaDeCruce)
 	
 	##Se cruzan los cromosomas 
-	
+	 cromosomaResultado = Cromosoma.new(@tamano)
 		self.each_with_index do |value , index| 
 			
 			posibilidad = rand(0..1)
 				
-			if posibilidad == 1
-					valorTemp = self[index]
-					self[index]	= cromosomaDeCruce[index]
-					cromosomaDeCruce[index] = valorTemp
+			if posibilidad == 1 then
+					cromosomaResultado[index] = self[index]
+					
+   			else
+					cromosomaResultado[index] = cromosomaDeCruce[index]
 						
 			end
 								
 		end
 		
-	return cromosomaDeCruce
+	return cromosomaResultado
   
   end
   
@@ -296,7 +297,7 @@ class Genetic < Array
 					hayCandidato = true
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
-						puts item	
+						p item	
 						puts "con la generacion #{i}"
 						candidato = item	
 						break if hayCandidato == true				
@@ -362,7 +363,7 @@ class Genetic < Array
 					hayCandidato = true
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
-						puts item	
+						p item	
 						puts "con la generción #{i}"
 						break if hayCandidato == true					
 				end
@@ -465,7 +466,7 @@ class Genetic < Array
 						hayCandidato = true
 							puts "HAYY CANDIDATO--------------------"
 							puts "con la aptitud: #{item.aptitud}" 
-							puts item	
+							p item	
 							puts "con la generción #{i}"
 							break if hayCandidato == true					
 					end
@@ -534,7 +535,7 @@ class Genetic < Array
 					hayCandidato = true
 						puts "HAYY CANDIDATO--------------------"
 						puts "con la aptitud: #{item.aptitud}" 
-						puts item	
+						p item	
 						puts "con la generacion #{i}"	
 						break if hayCandidato == true					
 				end
