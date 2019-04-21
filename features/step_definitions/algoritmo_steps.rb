@@ -79,6 +79,7 @@ Entonces("el resultado debe ser un cromosoma que tenga como elementos una combin
    end
   end
 end
+
 Dado("que tengo el cromosoma con los siguientes elementos [{int},{int},{int},{int},{int},{int},{int},{int},{int},{int}]") do |int, int2, int3, int4, int5, int6, int7, int8, int9, int10|
   elementos = [int, int2, int3, int4, int5, int6, int7, int8, int9, int10]
   @cromosoma_aptitud = Cromosoma.new(elementos.length)
@@ -95,4 +96,22 @@ end
 Entonces("me debe decir su aptitud") do
   p @cromosoma_aptitud.aptitud
 end
+
+Dado("que creo un cromosoma con {int} elementos") do |int|
+  @cromo = Cromosoma.new(int.to_i)
+end
+
+Cuando("aplique las funciones que encuentran las diagonales principales y secundarias con el indice {int}") do |int|
+  @indice = int.to_i
+  @principal = @cromo.calcularDiagonalPrincipal(@indice, @cromo[@indice])
+  @secundaria = @cromo.calcularDiagonalSecundaria(@indice, @cromo[@indice])
+end
+
+Entonces("me retorna las  dos matrices correspondientes a diagonales principales y secundarias") do
+  p "Matrix diagonales principales"
+  p @principal
+  p "Matrix diagonales secundarias"
+  p @secundaria
+end
+
 	
